@@ -1,4 +1,8 @@
 ---
+- name: Setting chroot path fact.
+  set_fact:
+    chroot_path: "{{ chroot }}"
+
 - name: Bootstrap chroot overlay in tmpfs.
   raw: "{{ item }}"
   loop: "{{ bootstrap_chroot_raw }}"

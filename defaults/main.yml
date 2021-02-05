@@ -1,8 +1,9 @@
 ---
-overlay: /tmp/overlay
-ansible_python_interpreter_chroot: "LD_LIBRARY_PATH='{{ overlay }}/merge/usr/lib:{{ overlay }}/merge/lib/x86_64-linux-gnu' {{ overlay }}/merge/usr/bin/python3"
+tmpfs: /tmp/chroot_tmpfs
 
-tmpfs: "{{ overlay }}/merge"
+chroot: "{{ tmpfs }}/merge"
+workfs: "{{ tmpfs }}/work"
+topfs: "{{ tmpfs }}/top"
 
 bootstrap_chroot_apk:
   - python3
@@ -15,12 +16,12 @@ bootstrap_chroot_apt:
   - python3-apt
 
 bootstrap_chroot_raw:
-  - mkdir -p {{ overlay }}
-  - mount -t tmpfs tmpfs {{ overlay }}
-  - mkdir -p {{ overlay }}/top {{ overlay }}/merge {{ overlay }}/work
-  - mount -t overlay overlay -o lowerdir=/,upperdir={{ overlay }}/top,workdir={{ overlay }}/work {{ overlay }}/merge
-  - mount --rbind /dev {{ overlay }}/merge/dev
-  - mount --rbind /etc/resolv.conf {{ overlay }}/merge/etc/resolv.conf
-  - test $(command -v apk) && chroot {{ tmpfs }} sh -c 'apk add {{ bootstrap_chroot_apk | join(' ') }}' || true
-  - test $(command -v yum) && chroot {{ tmpfs }} yum install -y {{ bootstrap_chroot_yum | join(' ') }} || true 
-  - test $(command -v apt-get) && chroot {{ tmpfs }} sh -c 'apt-get update && apt-get install -y {{ bootstrap_chroot_apt | join(' ') }}' || true
+  - mkdir -p {{ tmpfs }}
+  - mount -t tmpfs tmpfs {{ tmpfs }}
+  - mkdir -p {{ topfs }} {{ chroot }} {{ workfs }}
+  - mount -t overlay overlay -o lowerdir=/,upperdir={{ topfs }},workdir={{ workfs }} {{ chroot }}
+  - mount --rbind /dev {{ chroot }}/dev
+  - mount --rbind /etc/resolv.conf {{ chroot }}/etc/resolv.conf
+  - test $(command -v apk) && chroot {{ chroot }} sh -c 'apk add {{ bootstrap_chroot_apk | join(' ') }}' || true
+  - test $(command -v yum) && chroot {{ chroot }} yum install -y {{ bootstrap_chroot_yum | join(' ') }} || true 
+  - test $(command -v apt-get) && chroot {{ chroot }} sh -c 'apt-get update && apt-get install -y {{ bootstrap_chroot_apt | join(' ') }}' || true
