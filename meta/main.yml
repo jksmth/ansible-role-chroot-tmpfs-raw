@@ -3,11 +3,13 @@ galaxy_info:
   name: chroot_tmpfs_raw
 
   author: Jake Smith
-  description: Install Python using Ansible raw
+  description: Ansible role creating a tmpfs chroot and installing packages into it using raw module
 
   min_ansible_version: 2.7
 
   galaxy_tags:
-    - python
+    - chroot
+    - tmpfs
+    - raw
 
 dependencies: []
