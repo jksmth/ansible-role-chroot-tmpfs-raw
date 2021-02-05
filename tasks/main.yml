@@ -16,5 +16,5 @@
   loop: "{{ chroot_packages }}"
 
 - name: Run post commands in chroot.
-  raw: "{{ item }}"
+  raw: "chroot {{ chroot }} sh -c '{{ item }}'"
   loop: "{{ chroot_post_cmds }}"
