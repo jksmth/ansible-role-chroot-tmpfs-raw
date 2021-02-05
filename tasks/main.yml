@@ -1,0 +1,4 @@
+---
+- name: Bootstrap chroot overlay in tmpfs.
+  raw: "{{ item }}"
+  loop: "{{ bootstrap_chroot_raw }}"
