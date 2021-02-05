@@ -17,7 +17,7 @@ bootstrap_chroot_tmpfs:
   - mount -t overlay overlay -o lowerdir=/,upperdir={{ topfs }},workdir={{ workfs }} {{ chroot }}
 
 # Post commands - these are ran last
-post_chroot_cmds: []
+chroot_post_cmds: []
 
 # Packages if APK package manager
 chroot_apk_packages:

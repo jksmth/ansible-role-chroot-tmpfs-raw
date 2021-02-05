@@ -17,4 +17,4 @@
 
 - name: Run post commands in chroot.
   raw: "{{ item }}"
-  loop: "{{ post_chroot_cmds }}"
+  loop: "{{ chroot_post_cmds }}"
