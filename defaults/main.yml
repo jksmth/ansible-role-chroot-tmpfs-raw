@@ -5,23 +5,45 @@ chroot: "{{ tmpfs }}/merge"
 workfs: "{{ tmpfs }}/work"
 topfs: "{{ tmpfs }}/top"
 
-bootstrap_chroot_apk:
-  - python3
+bind_mounts:
+  - /dev
+  - /etc/resolv.conf
 
-bootstrap_chroot_yum:
-  - python3
-
-bootstrap_chroot_apt:
-  - python3-minimal
-  - python3-apt
-
-bootstrap_chroot_raw:
+# Commands to mount tmfs chroot overlay
+bootstrap_chroot_tmpfs:
   - mkdir -p {{ tmpfs }}
   - mount -t tmpfs tmpfs {{ tmpfs }}
   - mkdir -p {{ topfs }} {{ chroot }} {{ workfs }}
   - mount -t overlay overlay -o lowerdir=/,upperdir={{ topfs }},workdir={{ workfs }} {{ chroot }}
-  - mount --rbind /dev {{ chroot }}/dev
-  - mount --rbind /etc/resolv.conf {{ chroot }}/etc/resolv.conf
-  - test $(command -v apk) && chroot {{ chroot }} sh -c 'apk add {{ bootstrap_chroot_apk | join(' ') }}' || true
-  - test $(command -v yum) && chroot {{ chroot }} yum install -y {{ bootstrap_chroot_yum | join(' ') }} || true 
-  - test $(command -v apt-get) && chroot {{ chroot }} sh -c 'apt-get update && apt-get install -y {{ bootstrap_chroot_apt | join(' ') }}' || true
+
+# Post commands - these are ran last
+post_chroot_cmds: []
+
+# Packages if APK package manager
+chroot_apk_packages:
+  - python3
+
+chroot_apk:
+  - apk add {{ chroot_apk_packages | join(' ') }}
+
+# Packages if YUM package manager
+chroot_yum_packages:
+  - python3
+
+chroot_yum:
+  - yum install -y {{ chroot_yum_packages | join(' ') }}
+
+# Packages if APT package manager
+chroot_apt_packages:
+  - python3-minimal
+  - python3-apt
+
+chroot_apt:
+  - apt-get update
+  - apt-get install -y {{ chroot_apt_packages | join(' ') }}
+
+# Try package manager installs
+chroot_packages:
+  - test $(command -v apk) && chroot {{ chroot }} sh -c '{{ chroot_apk | join('&&') }}' || true
+  - test $(command -v yum) && chroot {{ chroot }} sh -c '{{ chroot_yum | join('&&') }}' || true
+  - test $(command -v apt-get) && chroot {{ chroot }} sh -c '{{ chroot_apt | join('&&') }}' || true

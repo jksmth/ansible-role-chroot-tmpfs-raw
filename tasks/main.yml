@@ -5,4 +5,16 @@
 
 - name: Bootstrap chroot overlay in tmpfs.
   raw: "{{ item }}"
-  loop: "{{ bootstrap_chroot_raw }}"
+  loop: "{{ bootstrap_chroot_tmpfs }}"
+
+- name: Bind mounts in chroot.
+  raw: "mount --rbind {{ item }} {{ chroot }}/{{ item }}"
+  loop: "{{ bind_mounts }}"
+
+- name: Install packages in chroot.
+  raw: "{{ item }}"
+  loop: "{{ chroot_packages }}"
+
+- name: Run post commands in chroot.
+  raw: "{{ item }}"
+  loop: "{{ post_chroot_cmds }}"
