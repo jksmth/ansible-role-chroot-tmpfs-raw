@@ -44,6 +44,6 @@ chroot_apt:
 
 # Try package manager installs
 chroot_packages:
-  - test $(command -v apk) && chroot {{ chroot }} sh -c '{{ chroot_apk | join('&&') }}' || true
-  - test $(command -v yum) && chroot {{ chroot }} sh -c '{{ chroot_yum | join('&&') }}' || true
-  - test $(command -v apt-get) && chroot {{ chroot }} sh -c '{{ chroot_apt | join('&&') }}' || true
+  - test $(command -v apk) && chroot {{ chroot }} sh -c '{{ chroot_apk | join(' && ') }}' || true
+  - test $(command -v yum) && chroot {{ chroot }} sh -c '{{ chroot_yum | join(' && ') }}' || true
+  - test $(command -v apt-get) && chroot {{ chroot }} sh -c '{{ chroot_apt | join(' && ') }}' || true
